@@ -1,103 +1,74 @@
-A powerful and interactive Python script designed to automate various reconnaissance tasks commonly performed during penetration testing and security assessments.
+# recon-auto
 
-Features
-Masscan Port Scanning:
-Quickly scans all TCP ports on a target IP using Masscan with customizable rate limits. Results are saved for further analysis.
+Interactive recon pipeline that chains Masscan, Nmap, Gobuster, and GoSpider with guided prompts. Run one script, get a full picture of the target.
 
-Nmap Scan:
-Parses Masscan results to extract open ports, then performs an aggressive Nmap scan (-A) on those ports to gather detailed information about services and vulnerabilities.
+## Pipeline
 
-Gobuster Directory Enumeration:
-Enumerates directories and files on a target web server using a wordlist and supports multiple file extensions.
+```
+Target IP/Domain
+      |
+      +-- Masscan    -->  fast full TCP port scan
+      +-- Nmap       -->  service/version/script scan on open ports
+      +-- Gobuster   -->  directory, subdomain, and vhost enumeration
+      +-- GoSpider   -->  web crawl (direct or via proxy)
+```
 
-Gobuster Subdomain and Vhost Enumeration:
-Performs DNS-based subdomain and virtual host enumeration for the target domain using large wordlists.
+Each stage is optional — pick what you need per run.
 
-GoSpider Web Crawler:
-Provides an interactive menu to run GoSpider scans either through an HTTP proxy or directly on a target site, with options for sitemap inclusion and concurrency settings.
+## Requirements
 
-Interactive Prompts:
-User-friendly CLI prompts guide the user through selecting which scans to run and configuring scan parameters.
+Install the following and ensure they are in `PATH`:
 
-Prerequisites
-Make sure the following tools are installed and accessible in your system’s PATH:
+| Tool | Install |
+|---|---|
+| [Masscan](https://github.com/robertdavidgraham/masscan) | `apt install masscan` |
+| [Nmap](https://nmap.org) | `apt install nmap` |
+| [Gobuster](https://github.com/OJ/gobuster) | `go install github.com/OJ/gobuster/v3@latest` |
+| [GoSpider](https://github.com/jaeles-project/gospider) | `go install github.com/jaeles-project/gospider@latest` |
+| Python 3 | `apt install python3` |
 
-Masscan
+Masscan and Nmap require `sudo`.
 
-Nmap
+## Usage
 
-Gobuster
-
-GoSpider
-
-Python 3
-
-Additionally, sudo privileges are required for Masscan and Nmap scans.
-
-Usage
-Clone or download this script.
-
-Run the script:
-
-bash
-Copy
-Edit
+```bash
+git clone https://github.com/im-whoami/recon-auto
+cd recon-auto
 python3 reconnaissance_script.py
-Follow the interactive prompts:
+```
 
-Enter the target IP address and domain.
+Follow the prompts:
 
-Choose whether to run Masscan port scan.
+```
+Enter the target IP address: 10.10.10.10
+Enter the target domain for subdomain/vhost enumeration: example.com
+Run Masscan? (y/n): y
+Run Nmap? (y/n): y
+Run Gobuster directory scan? (y/n): y
+Run Gobuster subdomain scan? (y/n): n
+Run GoSpider? (y/n): y
+```
 
-Choose whether to run Nmap scan on discovered ports.
+## Output files
 
-Choose whether to run Gobuster scans for directories, subdomains, or virtual hosts.
+| File | Contents |
+|---|---|
+| `masscan_output.txt` | Open ports |
+| `nmap_scan.*` | Service/version details (multiple formats) |
+| `gobuster_scan.txt` | Discovered directories |
+| `gobuster_subdomains.txt` | Subdomains |
+| `gobuster_vsubdomains.txt` | Virtual hosts |
 
-Choose whether to run GoSpider with proxy or site scan options.
+## Notes
 
-Review the saved output files:
+- Masscan is aggressive — tune the rate limit for your environment
+- Ensure wordlists are present and paths in the script match your system
+- Only run against targets you have explicit authorization to test
 
-masscan_output.txt (Masscan results)
+## License
 
-nmap_scan.* (Nmap results in multiple formats)
+MIT
 
-gobuster_scan.txt (Directory enumeration results)
+## Disclaimer
 
-gobuster_subdomains.txt (Subdomain enumeration results)
-
-gobuster_vsubdomains.txt (Vhost enumeration results)
-
-GoSpider output file as specified
-
-Notes
-Masscan can generate a large amount of traffic. Use with caution and within legal boundaries.
-
-Ensure your wordlists are correctly installed and the file paths in the script match your system.
-
-Running scans on targets without permission is illegal and unethical.
-
-Adjust scan rates and concurrency in the script or via interactive prompts to suit your network environment.
-
-Example Output
-plaintext
-Copy
-Edit
-*********************************************
-            Reconnaissance Script            
-*********************************************
-
-Enter the target IP address: 192.168.1.100
-Enter the target domain for Gobuster Vhost/subdomain enumeration (e.g., example.com): example.com
-Do you want to use Masscan Scan? (y/n): y
-
-Running Masscan (requires Sudo)...
-
-[...Masscan output...]
-
-Do you want to use Nmap scan? (y/n): y
-
-Running Nmap scan on 192.168.1.100 for ports: 22,80,443...
-
-[...Nmap output...]
-
-Reconnaissance completed.
+Unauthorized scanning is illegal. Use only on systems you own or have written permission to test.
